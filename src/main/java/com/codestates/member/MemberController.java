@@ -3,43 +3,31 @@ package com.codestates.member;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/v1/members")
+@Validated
 public class MemberController {
     @PostMapping
-    public ResponseEntity postMember(@RequestParam("email") String email,
-                             @RequestParam("name") String name,
-                             @RequestParam("phone") String phone) {
-        System.out.println("# email: " + email);
-        System.out.println("# name: " + name);
-        System.out.println("# phone: " + phone);
-
-        Map<String, String> map = new HashMap<>();
-        map.put("email", email);
-        map.put("name", name);
-        map.put("phone", phone);
-
-        return new ResponseEntity<>(map, HttpStatus.CREATED);
+    public ResponseEntity postMember(@Valid @RequestBody MemberPostDto memberPostDto) {
+        return new ResponseEntity<>(memberPostDto, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{member-id}")
-    public ResponseEntity patchMember(@PathVariable("member-id") long memberId,
-                                      @RequestParam String phone) {
+    public ResponseEntity patchMember(@PathVariable("member-id") @Min(1) long memberId,
+                                     @Valid @RequestBody MemberPatchDto memberPatchDto) {
+        memberPatchDto.setMemberId(memberId);
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("memberId", memberId);
-        body.put("email", "hgd@gmail.com");
-        body.put("name", "홍길동");
-        body.put("phone", phone);
-
-        return new ResponseEntity<Map>(body, HttpStatus.OK);
+        return new ResponseEntity<>(memberPatchDto, HttpStatus.OK);
     }
 
 
